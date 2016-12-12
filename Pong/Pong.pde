@@ -143,7 +143,7 @@ void draw() {
 void keyPressed() {
   switch (key) {
   case 'r': 
-    if (pantalla == 1 || pantalla == 2) iniciar_variables(); //Para reiniciar la partida en el juego o una vez hayamos perdido
+    if (pantalla == 1 || pantalla == 2) iniciar_variables(); pantalla = 1; //Para reiniciar la partida en el juego o una vez hayamos perdido
     break;
   case 'c':
     exit();
