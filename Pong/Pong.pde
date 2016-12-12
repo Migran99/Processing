@@ -77,7 +77,7 @@ void limites() { //Detectamos los limites
   //Rebote con el paddle
   if (bola_posx >= pad_posx && bola_posx <= pad_posx+grosor) {
     if (bola_posy+radio >= pad_posy && bola_posy <= pad_posy) {
-      bola_vely = bola_vely * -1;
+      bola_vely = (bola_vely * -1) - 1;
     }
   }
 
