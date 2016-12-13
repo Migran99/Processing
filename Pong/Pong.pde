@@ -27,7 +27,7 @@ void iniciar_variables() {
   pad_posy = height-height/5;
   pad_posx = mouseX-(grosor/2);
   bola_posx = width/2;
-  bola_posy = height/2;
+  bola_posy = height/4;
   bola_vely=round(random(1, vel0-(vel0/8)));
   bola_velx = (vel0 - bola_vely);
   font1 = createFont("Arial", 16, true);
