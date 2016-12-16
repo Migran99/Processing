@@ -17,16 +17,24 @@ int bola_vely = 0;
 int bola_posy =0;
 int radio = 15;
 int vel0 = 10;
+float angulov0 = 0;
 
 //Variables HUD
 int pantalla = 0;
 PFont font1;
+
+//Variables generales
+int puntos = 0;
+int vidas = 0;
 
 void setup() {
   size(500, 500);  //Tamaño de la pantalla
   frameRate(50);  //Framerate de la pantalla para evitar el tearing
   colorMode(HSB, 500);//Cambiamos el modo de color a HSB para poder cambiar los colores mas facilmente
   strokeWeight(5);  //Grosor del borde de los objetos
+  font1 = createFont("Arial", 16, true); //Creamos una fuente para las letras
+  vidas = 3; //Iniciamos las vidas y los puntos
+  puntos = 0;
   iniciar_variables(); //Iniciamos todas la variables necesarias
 }
 
@@ -53,14 +61,14 @@ void draw() {
 }
 
 void iniciar_variables() {
-  //Iniciamos todas la variables necesarias
+  //Iniciamos todas la variables necesarias salvo vida y puntos ya que estas se manejaran externamente para mayor comodidad
   pad_posy = height-height/5;
   pad_posx = mouseX-(grosor/2);
   bola_posx = width/2;
   bola_posy = height/4;
-  bola_vely=round(random(1, vel0-(vel0/8)));
-  bola_velx = (vel0 - bola_vely);
-  font1 = createFont("Arial", 16, true);
+  angulov0 = random(-0.6, 0.6); //Variamos la velocidad inicial en funcion de una direccion aletoria (angulo en radianes)
+  bola_vely=round(vel0*cos(angulov0));
+  bola_velx = round(vel0*sin(angulov0));
 }
 
 void dibujar_paddle() { //Dibujamos el Paddle
@@ -96,14 +104,31 @@ void limites() { //Detectamos los limites
   //Rebote con el paddle
   if (bola_posx >= pad_posx && bola_posx <= pad_posx+grosor) {
     if (bola_posy+radio >= pad_posy && bola_posy <= pad_posy) {
-      bola_vely = (bola_vely * -1) - 1;
+      bola_vely = bola_vely*-1;
+      puntos+=1;
     }
   }
 
   //Fin del juego
   if (bola_posy+radio >= height) {
-    pantalla = 2;
+    vidas -=1;
+    iniciar_variables();
+    if (vidas == 0) pantalla = 2;
   }
+}
+
+void dibujar_hud() { //Dibujamos el HUD en el juego. Los puntos y las vidas
+  textFont(font1, height/9);  //Seleccionamos la fuente del texto            
+  fill(mouseX, mouseY, (mouseX+mouseY)/2);
+  textAlign(LEFT); //La alineacion del texto con la posicion que demos
+  text("Puntos: " + puntos, width/2 - textWidth("Puntos:  " + puntos), height/9);
+  fill(mouseY, mouseX, (mouseX+mouseY)/2);
+  textAlign(RIGHT);
+  text("Vidas: " + vidas, width/2 + textWidth("Vidas:  " + vidas), height/9);
+  textFont(font1, 16); 
+  fill(500);
+  textAlign(LEFT);
+  text("Pulsa P para pausar", width-textWidth("Pulsa P para pausar:"), height-16);
 }
 
 void menu() { //En este bloque dibujamos el HUD del menu principal
@@ -119,7 +144,7 @@ void menu() { //En este bloque dibujamos el HUD del menu principal
   textFont(font1, 16); 
   fill(500);
   textAlign(LEFT);
-  text("Miguel Granero", width-textWidth("Miguel Granero"), height-16);
+  text("Miguel Granero", width-textWidth("Miguel Granero:"), height-16);
 }
 
 void juego() { //Dibujamos el HUD del juego
@@ -128,40 +153,50 @@ void juego() { //Dibujamos el HUD del juego
   mover_bola();
   mover_paddle();
   limites();
+  dibujar_hud();
 }
 
-void perder() {
+void perder() { //Al perder
   textFont(font1, height/6);         
   fill(mouseX, mouseY, (mouseX+mouseY)/2);
   textAlign(CENTER);
   text("PIERDES", width/2, height/4);   
   textFont(font1, height/9); 
   text("Pulsa 'r' para repetir ", width/2, height/2);   
-  text("o 'c' para salir ", width/2, height/2 + height/6);
+  text("o 'c' para salir ", width/2, height/2 + height/6); 
+  fill(mouseY, mouseX, (mouseX+mouseY)/2);
+  text("Puntos: " + puntos, width/2, height - height/8);
 }
 
-void pausa() {
+void pausa() { //Al pausar el juego
   dibujar_paddle();
   dibujar_bola();
+  dibujar_hud();
+  textFont(font1, height/4);         
+  fill(mouseX, mouseY, (mouseX+mouseY)/2);
+  textAlign(CENTER);
+  text("PAUSA", width/2, height/2);
 }
 
-void keyPressed() {
+void keyPressed() { //CUando pulsamos una tecla
   switch (key) {
   case 'r': 
-    if (pantalla == 1 || pantalla == 2) iniciar_variables(); 
-    pantalla = 1; //Para reiniciar la partida en el juego o una vez hayamos perdido
+    if (pantalla == 1 || pantalla == 2) iniciar_variables(); //Para reiniciar la partida en el juego o una vez hayamos perdido
+    puntos = 0;
+    vidas = 3;
+    pantalla = 1; 
     break;
   case 'c':
-    exit();
+    exit(); //Para salir del juego
     break;
 
   case 'p': 
-    if (pantalla == 1) pantalla = 3;
+    if (pantalla == 1) pantalla = 3; //Para pausar el juego
     else if (pantalla  == 3) pantalla = 1;
   }
 }
 
-void mouseClicked() {
+void mouseClicked() { //Al pulsar el raton
   if (mouseY < height/2 + height/6 && mouseY > height/2 && pantalla == 0) {
     pantalla=1; //Si pulsamos el boton del menu entramos al juego
   }
