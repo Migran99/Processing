@@ -22,6 +22,35 @@ int vel0 = 10;
 int pantalla = 0;
 PFont font1;
 
+void setup() {
+  size(500, 500);  //Tamaño de la pantalla
+  frameRate(50);  //Framerate de la pantalla para evitar el tearing
+  colorMode(HSB, 500);//Cambiamos el modo de color a HSB para poder cambiar los colores mas facilmente
+  strokeWeight(5);  //Grosor del borde de los objetos
+  iniciar_variables(); //Iniciamos todas la variables necesarias
+}
+
+
+void draw() {
+  background(200, 0, 50); //Limpiamos la pantalla
+  switch (pantalla) { //Dibujamos una cosa u otra dependiendo del estado del juego
+  case 0: 
+    menu();
+    break;
+
+  case 1: 
+    juego();
+    break;
+
+  case 2: 
+    perder();
+    break;
+
+  case 3:
+    pausa();
+  }
+}
+
 void iniciar_variables() {
   //Iniciamos todas la variables necesarias
   pad_posy = height-height/5;
@@ -33,24 +62,11 @@ void iniciar_variables() {
   font1 = createFont("Arial", 16, true);
 }
 
-
-void setup() {
-  size(500, 500);  //Tamaño de la pantalla
-  frameRate(50);  //Framerate de la pantalla para evitar el tearing
-  colorMode(HSB, 500);//Cambiamos el modo de color a HSB para poder cambiar los colores mas facilmente
-  strokeWeight(5);  //Grosor del borde de los objetos
-  iniciar_variables(); //Iniciamos todas la variables necesarias
-}
-
 void dibujar_paddle() { //Dibujamos el Paddle
-  //Posicion
-  pad_posx = mouseX-(grosor/2);
-  //Dibujamos
   fill(pad_posx, pad_posy, pad_posx);
   stroke(pad_posx+10, pad_posy-10, 300);
   rect(pad_posx, pad_posy, grosor, altura);
 }
-
 
 void dibujar_bola() {//Dibujamos la bola
   fill(bola_posx, bola_posy, bola_posx);
@@ -58,12 +74,14 @@ void dibujar_bola() {//Dibujamos la bola
   ellipse(bola_posx, bola_posy, radio*2, radio*2);
 }
 
-
 void mover_bola() { //Movemos la bola
   bola_posx+= bola_velx;
   bola_posy+= bola_vely;
 }
 
+void mover_paddle() {   //Cambiamos la posicion del paddle
+  pad_posx = mouseX-(grosor/2);
+}
 
 void limites() { //Detectamos los limites
   //Rebote bordes
@@ -87,8 +105,6 @@ void limites() { //Detectamos los limites
   }
 }
 
-
-
 void menu() { //En este bloque dibujamos el HUD del menu principal
   textFont(font1, height/4);  //Seleccionamos la fuente del texto            
   fill(mouseX, mouseY, (mouseX+mouseY)/2);
@@ -109,6 +125,7 @@ void juego() { //Dibujamos el HUD del juego
   dibujar_paddle();
   dibujar_bola();
   mover_bola();
+  mover_paddle();
   limites();
 }
 
@@ -122,32 +139,24 @@ void perder() {
   text("o 'c' para salir ", width/2, height/2 + height/6);
 }
 
-void draw() {
-  background(200, 0, 50); //Limpiamos la pantalla
-
-  switch (pantalla) { //Dibujamos una cosa u otra dependiendo del estado del juego
-  case 0: 
-    menu();
-    break;
-
-  case 1: 
-    juego();
-    break;
-
-  case 2: 
-    perder();
-    break;
-  }
+void pausa() {
+  dibujar_paddle();
+  dibujar_bola();
 }
 
 void keyPressed() {
   switch (key) {
   case 'r': 
-    if (pantalla == 1 || pantalla == 2) iniciar_variables(); pantalla = 1; //Para reiniciar la partida en el juego o una vez hayamos perdido
+    if (pantalla == 1 || pantalla == 2) iniciar_variables(); 
+    pantalla = 1; //Para reiniciar la partida en el juego o una vez hayamos perdido
     break;
   case 'c':
     exit();
     break;
+
+  case 'p': 
+    if (pantalla == 1) pantalla = 3;
+    else if (pantalla  == 3) pantalla = 1;
   }
 }
 
