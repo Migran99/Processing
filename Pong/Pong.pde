@@ -48,6 +48,7 @@ void draw() {
 
   case 3:
     pausa();
+    break;
   }
 }
 
@@ -161,7 +162,7 @@ void keyPressed() {
 }
 
 void mouseClicked() {
-  if (mouseY < height/2 + height/6 && mouseY > height/2) {
+  if (mouseY < height/2 + height/6 && mouseY > height/2 && pantalla == 0) {
     pantalla=1; //Si pulsamos el boton del menu entramos al juego
   }
 }
